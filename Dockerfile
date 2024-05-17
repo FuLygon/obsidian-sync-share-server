@@ -1,27 +1,41 @@
-
-# obsidian-sync-share-server
-
-# 使用jre 17 作为基础镜像
-FROM azul/zulu-openjdk-alpine:17-latest
-
-# 设置工作目录
+FROM node:20 as web-builder
 WORKDIR /app
 
-# 复制项目构建结果到镜像中
-COPY target/obsidian-sync-share-server-*.jar obsidian-sync-share-server.jar
-# COPY obsidian-sync-share-server-*.jar obsidian-sync-share-server.jar
+# get dependencies
+COPY obsidian-sync-share-web/package*.json .
+RUN yarn install
 
-# 暴露服务的端口号
-EXPOSE 8080
+# build web
+COPY obsidian-sync-share-web/. .
+RUN yarn run build
 
-# 设置环境变量
+FROM azul/zulu-openjdk-alpine:17-latest as server-builder
+WORKDIR /app
+
+COPY .mvn .mvn
+COPY pom.xml mvnw .
+
+# make executable
+RUN chmod +x mvnw
+
+# get dependencies
+RUN ./mvnw -B dependency:go-offline 
+
+# build server
+COPY src src
+COPY --from=web-builder /app/dist src/main/resources/static
+RUN ./mvnw package
+
+# runner
+FROM azul/zulu-openjdk-alpine:17-latest
+WORKDIR /app
+
+# copy jar file
+COPY --from=server-builder /app/target/*.jar ./obsidian-sync-share-server.jar
+
+# set env
 ENV JAVA_OPTS=""
 
-# 执行启动命令
+EXPOSE 8080
+
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar obsidian-sync-share-server.jar"]
-
-
-
-
-
-

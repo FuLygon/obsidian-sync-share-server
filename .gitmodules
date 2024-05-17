@@ -1,0 +1,3 @@
+[submodule "obsidian-sync-share-web"]
+	path = obsidian-sync-share-web
+	url = https://github.com/FuLygon/obsidian-sync-share-web.git

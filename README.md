@@ -1,33 +1,33 @@
 # obsidian-sync-share-server
 
-Sync and share your notes, Back-end projects
+This fork mainly use for building Obsidian Sync Share Server with my forked [Obsidian Sync Share Web](https://github.com/FuLygon/obsidian-sync-share-web).
 
+Added Actions workflow to automatically build server as Github package.
 
+### Basic Usage
 
-# dev
+- `docker run`
+```
+docker volume create obsidian-sync-share-data
 
-Standard springboot project, import the idea can be started, does not depend on the database
-
-
-# front-end
-
-Please compile the front-end project and place it in `src/main/resources/static/`
-
-
-# docker history
-```shell
-docker build -t obsidian-sync-share-server:1.2.1 .
-
-docker login
-
-docker tag obsidian-sync-share-server:1.2.1 alterzz/obsidian-sync-share-server:1.2.1
-
-docker tag obsidian-sync-share-server:1.2.1 alterzz/obsidian-sync-share-server:latest
-
-docker push alterzz/obsidian-sync-share-server:1.2.1
-
-docker push alterzz/obsidian-sync-share-server:latest
-
+docker run -d --name obsidian-sync-share-server -p 80:8080 -v obsidian-sync-share-data:/app/user_store ghcr.io/fulygon/obsidian-sync-share-server:latest
 ```
 
+- `docker-compose.yaml`
+```
+services:
+  obsidian-sync-share-server:
+    image: ghcr.io/fulygon/obsidian-sync-share-server:latest
+    container_name: obsidian-sync-share-server
+    volumes:
+      - obsidian-sync-share-data:/app/user_store
+    ports:
+      - 80:8080
+
+volumes:
+  obsidian-sync-share-data:
+```
+
+### Advanced Usage
+Please refer to the original documentation: [Alt-er/obsidian-sync-share](https://github.com/Alt-er/obsidian-sync-share)
 

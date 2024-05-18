@@ -3,7 +3,7 @@ WORKDIR /app
 
 # get dependencies
 COPY obsidian-sync-share-web/package*.json .
-RUN yarn install
+RUN yarn install --network-timeout 180000
 
 # build web
 COPY obsidian-sync-share-web/. .
@@ -26,7 +26,6 @@ COPY src src
 COPY --from=web-builder /app/dist src/main/resources/static
 RUN ./mvnw package
 
-# runner
 FROM azul/zulu-openjdk-alpine:17-latest
 WORKDIR /app
 
